@@ -1,36 +1,244 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PeerPilot – Smarter Reviewer Recommendations</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RefNexus — Reviewer recommendations without the guesswork</title>
+  <meta name="description" content="RefNexus ranks the right reviewers instantly using embeddings, MeSH/topic signals, and co-author graphs. Auditable, fast, and policy-aware." />
+  <meta property="og:title" content="RefNexus — Reviewer recommendations without the guesswork" />
+  <meta property="og:description" content="Rank reviewers instantly. Explainable scores. No PII required." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://refnexus.ai" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- Tailwind CSS CDN (no build step) -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Optional: font smoothing for a cleaner look */
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  </style>
 </head>
-<body class="bg-white text-gray-900 flex items-center justify-center min-h-screen p-6">
-  <div class="max-w-2xl w-full text-center">
-    <h1 class="text-5xl font-bold mb-4 text-blue-700">PeerPilot</h1>
-    <p class="text-lg text-gray-700 mb-6">
-      The reviewer recommender engine for modern editorial teams.  
-      Instantly surface the most relevant reviewers for any manuscript — based on the full content of the abstract and past publishing history.
-    </p>
-
-    <div class="bg-gray-100 rounded-lg p-6 text-left shadow">
-      <h2 class="text-xl font-semibold mb-3">Why PeerPilot?</h2>
-      <ul class="list-disc list-inside text-gray-800 space-y-2">
-        <li><strong>Instant reviewer suggestions</strong> based on abstract content — no keyword tagging needed</li>
-        <li><strong>Identifies relevant reviewers</strong> from all authors who’ve published in your journal</li>
-        <li><strong>Finds new potential reviewers</strong> — not just your usual editorial circle</li>
-        <li><strong>Reduces reviewer fatigue</strong> by expanding the qualified pool intelligently</li>
-        <li><strong>Speeds up the peer review process</strong> by giving you high-quality suggestions immediately</li>
-        <li><strong>Supports fairness and transparency</strong> through repeatable, content-based logic</li>
-      </ul>
+<body class="bg-white text-slate-900">
+  <!-- Navigation -->
+  <header class="sticky top-0 z-50 bg-white/70 backdrop-blur border-b">
+    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+      <!-- Inline SVG Logo -->
+      <a href="#" class="flex items-center gap-2 text-slate-900 hover:opacity-90" aria-label="RefNexus home">
+        <svg width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-sm">
+          <circle cx="32" cy="32" r="24" stroke="currentColor" stroke-width="2" opacity="0.35" />
+          <path d="M22 22h8c4 0 7 3 7 7s-3 7-7 7h-8V22z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M30 36l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+          <circle cx="30" cy="29" r="2.6" fill="currentColor" />
+          <circle cx="42" cy="48" r="2.6" fill="currentColor" />
+        </svg>
+        <span class="text-xl font-semibold tracking-tight">RefNexus</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6 text-sm text-slate-600">
+        <a href="#problem" class="hover:text-slate-900">Problem</a>
+        <a href="#solution" class="hover:text-slate-900">Solution</a>
+        <a href="#how" class="hover:text-slate-900">How it works</a>
+        <a href="#offer" class="hover:text-slate-900">What we offer</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href="#contact" class="hidden sm:inline-flex px-3 py-2 rounded-md border text-sm hover:bg-slate-50">Contact</a>
+        <!-- TODO: Replace href with your actual Streamlit URL -->
+        <a href="https://streamlit.refnexus.app" target="_blank" rel="noreferrer" class="inline-flex items-center px-4 py-2 rounded-md bg-sky-500 text-white text-sm font-medium hover:bg-sky-600">
+          Launch Demo
+          <svg class="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7l7 7-7 7"/></svg>
+        </a>
+      </div>
     </div>
+  </header>
 
-    <a href="https://reviewerrecommenderengine.streamlit.app" target="_blank" class="inline-block mt-6 bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition">
-      View Demo
-    </a>
+  <!-- Hero -->
+  <section class="relative">
+    <div class="absolute inset-0 -z-10">
+      <div class="absolute -top-28 right-0 h-72 w-72 rounded-full blur-3xl opacity-25 bg-gradient-to-br from-sky-400/40 to-slate-200"></div>
+    </div>
+    <div class="mx-auto max-w-6xl px-4 py-16 md:py-24 grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <div class="inline-flex items-center gap-2 mb-4 px-2.5 py-1 rounded-full border text-xs text-slate-700">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.39 4.84L20 8.27l-4 3.89.94 5.48L12 15.9l-4.94 2.74.94-5.48-4-3.89 5.61-1.43L12 2z"/></svg>
+          Reviewer Matching — Reimagined
+        </div>
+        <h1 class="text-4xl md:text-5xl font-semibold leading-tight tracking-tight">Reviewer recommendations without the guesswork.</h1>
+        <p class="mt-4 text-lg text-slate-600">RefNexus ingests abstracts and your reviewer universe to rank the right experts instantly — reducing time-to-assignment and improving review quality.</p>
+        <div class="mt-6 flex flex-wrap items-center gap-3">
+          <a href="https://streamlit.refnexus.app" target="_blank" rel="noreferrer" class="inline-flex px-5 py-3 rounded-md bg-sky-500 text-white font-medium hover:bg-sky-600">Open the Streamlit App</a>
+          <a href="#contact" class="inline-flex px-5 py-3 rounded-md border font-medium hover:bg-slate-50">Request a Pilot</a>
+        </div>
+        <div class="mt-6 flex flex-wrap items-center gap-4 text-sm text-slate-600">
+          <div class="flex items-center gap-2">Auditable scoring</div>
+          <div class="flex items-center gap-2">LLM + embeddings</div>
+          <div class="flex items-center gap-2">No PII required</div>
+        </div>
+      </div>
+      <div>
+        <div class="rounded-xl border shadow-sm p-6">
+          <h3 class="text-lg font-semibold mb-3">Why editors use RefNexus</h3>
+          <ul class="space-y-3 text-sm text-slate-600">
+            <li><span class="font-medium text-slate-900">Speed:</span> Instant shortlist from thousands of potential reviewers.</li>
+            <li><span class="font-medium text-slate-900">Fit:</span> Topic- and MeSH-aware similarity plus conflict filters.</li>
+            <li><span class="font-medium text-slate-900">Coverage:</span> Surfaces reliable veterans and promising new reviewers.</li>
+            <li><span class="font-medium text-slate-900">Control:</span> Tunable weights (career stage, recency, journal policy).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <p class="text-sm text-gray-500 mt-4">Built by radiologists and editors. PeerPilot is already in use at Radiographics and RSNA.</p>
-  </div>
+  <!-- Problem -->
+  <section id="problem" class="mx-auto max-w-6xl px-4 py-16">
+    <div class="grid md:grid-cols-2 gap-10 items-start">
+      <div>
+        <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">The problem</h2>
+        <p class="mt-3 text-slate-600">Reviewer assignment is slow, political, and error-prone. Editors rely on partial memory, scattered spreadsheets, and vague topic tags — leading to delays, misfits, and reviewer burnout.</p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-700">
+          <li>• Searching across thousands of authors is manual and inconsistent.</li>
+          <li>• Topic tags rarely capture real expertise or recency.</li>
+          <li>• The same few reviewers are overused; new talent is invisible.</li>
+          <li>• Auditing decisions later is painful.</li>
+        </ul>
+      </div>
+      <div class="rounded-xl border p-6">
+        <h3 class="text-lg font-semibold mb-2">What editors tell us</h3>
+        <div class="text-sm text-slate-600 space-y-3">
+          <p>“I need a shortlist I can trust in <span class="font-medium text-slate-900">under 60 seconds</span>.”</p>
+          <p>“Show me why someone is a good fit — not just a name.”</p>
+          <p>“Let me tune the knobs to match <span class="font-medium text-slate-900">my</span> journal’s policy.”</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solution -->
+  <section id="solution" class="mx-auto max-w-6xl px-4 py-16">
+    <div class="grid md:grid-cols-2 gap-10 items-start">
+      <div>
+        <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">Our solution</h2>
+        <p class="mt-3 text-slate-600">RefNexus blends dense embeddings with MeSH/topic signals and co-author graphs to generate ranked reviewer candidates with <span class="font-medium text-slate-900">transparent rationale</span> and policy-aware filters.</p>
+        <div class="mt-6 grid sm:grid-cols-2 gap-3">
+          <div class="rounded-lg border p-4">
+            <h4 class="font-semibold mb-1">Semantic match</h4>
+            <p class="text-sm text-slate-600">Vector search pinpoints true expertise beyond keywords.</p>
+          </div>
+          <div class="rounded-lg border p-4">
+            <h4 class="font-semibold mb-1">Policy-aware</h4>
+            <p class="text-sm text-slate-600">Weights for seniority, recency, conflicts, and reviewer load.</p>
+          </div>
+          <div class="rounded-lg border p-4">
+            <h4 class="font-semibold mb-1">Auditable</h4>
+            <p class="text-sm text-slate-600">Explainable scores; export decisions for compliance.</p>
+          </div>
+          <div class="rounded-lg border p-4">
+            <h4 class="font-semibold mb-1">Fast integration</h4>
+            <p class="text-sm text-slate-600">Start with CSVs or connect OpenAlex/PubMed; no PII needed.</p>
+          </div>
+        </div>
+      </div>
+      <div class="rounded-xl border p-6 h-full">
+        <h3 class="text-lg font-semibold mb-2">Under the hood</h3>
+        <ul class="space-y-3 text-sm text-slate-700">
+          <li>• Per-author embeddings aggregated to reviewer profiles.</li>
+          <li>• MeSH/topic constraints blended with cosine/Jaccard.</li>
+          <li>• Co-author graph and conflict heuristics.</li>
+          <li>• Tunable weights per journal or section editor.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" class="mx-auto max-w-6xl px-4 py-16">
+    <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">How it works</h2>
+    <div class="mt-6 grid md:grid-cols-4 gap-4">
+      <div class="rounded-lg border p-4">
+        <span class="inline-block text-xs px-2 py-0.5 rounded-full border mb-2">Step 1</span>
+        <h4 class="font-semibold mb-1">Ingest</h4>
+        <p class="text-sm text-slate-600">Drop reviewer lists or connect OpenAlex/PubMed. We build a clean, deduped index.</p>
+      </div>
+      <div class="rounded-lg border p-4">
+        <span class="inline-block text-xs px-2 py-0.5 rounded-full border mb-2">Step 2</span>
+        <h4 class="font-semibold mb-1">Submit</h4>
+        <p class="text-sm text-slate-600">Paste a title + abstract (or upload CSV). We parse, normalize, and tag.</p>
+      </div>
+      <div class="rounded-lg border p-4">
+        <span class="inline-block text-xs px-2 py-0.5 rounded-full border mb-2">Step 3</span>
+        <h4 class="font-semibold mb-1">Rank</h4>
+        <p class="text-sm text-slate-600">Embedding similarity + topic filters + policy weights → ranked shortlist.</p>
+      </div>
+      <div class="rounded-lg border p-4">
+        <span class="inline-block text-xs px-2 py-0.5 rounded-full border mb-2">Step 4</span>
+        <h4 class="font-semibold mb-1">Assign</h4>
+        <p class="text-sm text-slate-600">One-click export or send to your workflow. Audit trail included.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Offer -->
+  <section id="offer" class="mx-auto max-w-6xl px-4 py-16">
+    <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">What we offer</h2>
+    <div class="mt-6 grid md:grid-cols-3 gap-4">
+      <div class="rounded-xl border p-6">
+        <h3 class="font-semibold mb-2">Editor Demo</h3>
+        <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+          <li>Paste abstracts, get ranked reviewers</li>
+          <li>Adjust weights & filters</li>
+          <li>CSV export</li>
+        </ul>
+      </div>
+      <div class="rounded-xl border p-6">
+        <h3 class="font-semibold mb-2">Pilot Pack</h3>
+        <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+          <li>Secure data handoff</li>
+          <li>Custom scoring profile</li>
+          <li>Weekly review with editors</li>
+        </ul>
+      </div>
+      <div class="rounded-xl border p-6">
+        <h3 class="font-semibold mb-2">Enterprise</h3>
+        <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+          <li>SSO, usage analytics, API integration, and SLAs</li>
+          <li>Role-based access & audit exports</li>
+          <li>Custom integrations</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="mx-auto max-w-6xl px-4 py-16">
+    <div class="rounded-xl border p-6">
+      <h3 class="text-lg font-semibold mb-2">Get in touch</h3>
+      <p class="text-sm text-slate-600 mb-4">Want a pilot or a private walkthrough? Email us and we’ll follow up with a short checklist to get you live.</p>
+      <a href="mailto:hello@refnexus.ai?subject=Pilot%20request" class="inline-flex px-5 py-3 rounded-md bg-slate-900 text-white font-medium hover:bg-slate-800">Request Pilot</a>
+      <a href="https://streamlit.refnexus.app" target="_blank" rel="noreferrer" class="ml-3 inline-flex px-5 py-3 rounded-md border font-medium hover:bg-slate-50">Open Demo</a>
+    </div>
+    <div class="mt-6 text-xs text-slate-500 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span>Built for editors & program managers</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="#" class="underline">Privacy</a>
+        <a href="#" class="underline">Terms</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t mt-12">
+    <div class="mx-auto max-w-6xl px-4 py-8 text-xs text-slate-500 flex items-center justify-between">
+      <div class="flex items-center gap-2 text-slate-700">
+        <svg width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="32" cy="32" r="24" stroke="currentColor" stroke-width="2" opacity="0.35" />
+          <path d="M22 22h8c4 0 7 3 7 7s-3 7-7 7h-8V22z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M30 36l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+          <circle cx="30" cy="29" r="2.6" fill="currentColor" />
+          <circle cx="42" cy="48" r="2.6" fill="currentColor" />
+        </svg>
+        <span class="font-semibold text-slate-800">RefNexus</span>
+      </div>
+      <span>© 2025 RefNexus</span>
+    </div>
+  </footer>
 </body>
 </html>
